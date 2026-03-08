@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三友聚会排班表 v2.0</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .rest-all { background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%) !important; color: white !important; font-weight: bold; transform: scale(1.05); box-shadow: 0 4px 12px rgba(255, 140, 0, 0.4); }
+        .day-card { aspect-ratio: 1/1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 12px; font-size: 0.85rem; position: relative; background: #fff; border: 1px solid #f0f0f0; }
+        .is-holiday::after { content: '休'; position: absolute; top: 2px; right: 4px; font-size: 10px; color: #ef4444; }
+        .extra-badge { font-size: 9px; margin-top: 2px; opacity: 0.8; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 pb-10">
+    <div class="max-w-md mx-auto p-4">
+        <header class="bg-white rounded-3xl p-6 shadow-sm mb-6 text-center border border-slate-100">
+            <h1 class="text-xl font-extrabold tracking-tight">🗓️ 聚会时间捕捉器</h1>
+            <div class="flex justify-center gap-2 mt-2">
+                <span class="px-2 py-0.5 bg-blue-100 text-blue-600 text-[10px] rounded-full font-bold">陈沛冉</span>
+                <span class="px-2 py-0.5 bg-green-100 text-green-600 text-[10px] rounded-full font-bold">秦玥</span>
+                <span class="px-2 py-0.5 bg-purple-100 text-purple-600 text-[10px] rounded-full font-bold">申浩童</span>
+            </div>
+        </header>
+
+        <div class="bg-white rounded-3xl p-4 shadow-sm border border-slate-100">
+            <div class="flex justify-between items-center mb-6 px-2">
+                <button onclick="changeMonth(-1)" class="text-slate-400 hover:text-blue-500">◀</button>
+                <h2 id="monthTitle" class="text-lg font-bold">2026年 3月</h2>
+                <button onclick="changeMonth(1)" class="text-slate-400 hover:text-blue-500">▶</button>
+            </div>
+            
+            <div class="grid grid-cols-7 gap-2 mb-2 text-center text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+            </div>
+            <div id="calendarDays" class="grid grid-cols-7 gap-2 text-center"></div>
+        </div>
+
+        <div class="mt-6 bg-white rounded-3xl p-6 shadow-sm border border-slate-100">
+            <h3 class="font-bold text-sm mb-4 flex items-center">➕ 添加临时休息</h3>
+            <div class="grid grid-cols-1 gap-3">
+                <div class="flex gap-2">
+                    <input type="date" id="extraDate" class="flex-1 border border-slate-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <select id="extraName" class="border border-slate-200 rounded-xl px-3 py-2 text-sm bg-white">
+                        <option value="CPR">陈沛冉</option>
+                        <option value="QY">秦玥</option>
+                        <option value="SHT">申浩童</option>
+                    </select>
+                </div>
+                <button onclick="addExtra()" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold text-sm hover:bg-slate-800 transition-all active:scale-95">更新排班</button>
+            </div>
+            <div id="extraList" class="mt-4 flex flex-wrap gap-2"></div>
+        </div>
+
+        <div class="mt-6 text-[11px] text-slate-400 px-4 space-y-1">
+            <p>🌟 <strong>金色高亮：</strong> 三人共同休息日（火速约起！）</p>
+            <p>🇨🇳 已同步2026法定节假日（秦玥自动适配）。</p>
+            <p>🔄 申浩童目前处于：双周周六日休息模式。</p>
+        </div>
+    </div>
+
+    <script>
+        // 2026 法定节假日数据 (简易版)
+        const holidays2026 = [
+            '2026-01-01', // 元旦
+            '2026-01-28', '2026-01-29', '2026-01-30', '2026-01-31', '2026-02-01', '2026-02-02', '2026-02-03', // 春节
+            '2026-04-04', '2026-04-05', '2026-04-06', // 清明
+            '2026-05-01', '2026-05-02', '2026-05-03', '2026-05-04', '2026-05-05', // 五一
+            '2026-06-20', '2026-06-21', '2026-06-22', // 端午
+            '2026-09-25', '2026-09-26', '2026-09-27', // 中秋
+            '2026-10-01', '2026-10-02', '2026-10-03', '2026-10-04', '2026-10-05', '2026-10-06', '2026-10-07' // 国庆
+        ];
+
+        let extraRests = []; // 存储临时休息日 {date: '2026-03-10', name: 'CPR'}
+        let viewDate = new Date(2026, 2, 1); // 默认看2026年3月
+
+        function addExtra() {
+            const dateInput = document.getElementById('extraDate');
+            const nameSelect = document.getElementById('extraName');
+            if (!dateInput.value) return;
+            
+            extraRests.push({ date: dateInput.value, name: nameSelect.value });
+            updateExtraList();
+            renderCalendar();
+            dateInput.value = '';
+        }
+
+        function updateExtraList() {
+            const list = document.getElementById('extraList');
+            list.innerHTML = extraRests.map((item, index) => `
+                <span class="px-2 py-1 bg-slate-100 rounded text-[10px] flex items-center gap-1">
+                    ${item.date} ${item.name}
+                    <b onclick="removeExtra(${index})" class="text-red-500 cursor-pointer ml-1">×</b>
+                </span>
+            `).join('');
+        }
+
+        function removeExtra(index) {
+            extraRests.splice(index, 1);
+            updateExtraList();
+            renderCalendar();
+        }
+
+        // 逻辑判断
+        function isCPRRest(date) {
+            const refDate = new Date(2026, 1, 24); // Day 1
+            const diffDays = Math.floor((date - refDate) / (1000 * 3600 * 24));
+            const cycleDay = ((diffDays % 8) + 8) % 8 + 1;
+            const isBaseRest = [3, 6, 7, 8].includes(cycleDay);
+            const isExtra = extraRests.some(e => e.date === formatDate(date) && e.name === 'CPR');
+            return isBaseRest || isExtra;
+        }
+
+        function isQYRest(date) {
+            const day = date.getDay();
+            const dateStr = formatDate(date);
+            const isStandardRest = day === 0 || day === 6 || holidays2026.includes(dateStr);
+            const isExtra = extraRests.some(e => e.date === dateStr && e.name === 'QY');
+            return isStandardRest || isExtra;
+        }
+
+        function isSHTRest(date) {
+            // 基准：3月2-8日那一周是休周六日（双周模式）
+            const refWeek = new Date(2026, 2, 2); // 2026-03-02 周一
+            const diffDays = Math.floor((date - refWeek) / (1000 * 3600 * 24));
+            const weekNum = Math.floor(diffDays / 7);
+            const dayInWeek = date.getDay(); // 0日, 1-6
+
+            let isBaseRest = false;
+            if (weekNum % 2 === 0) {
+                isBaseRest = (dayInWeek === 0 || dayInWeek === 6); // 周六日
+            } else {
+                isBaseRest = (dayInWeek === 4 || dayInWeek === 5); // 周四五
+            }
+            const isExtra = extraRests.some(e => e.date === formatDate(date) && e.name === 'SHT');
+            return isBaseRest || isExtra;
+        }
+
+        function formatDate(date) {
+            return date.toISOString().split('T')[0];
+        }
+
+        function changeMonth(step) {
+            viewDate.setMonth(viewDate.getMonth() + step);
+            renderCalendar();
+        }
+
+        function renderCalendar() {
+            const container = document.getElementById('calendarDays');
+            const title = document.getElementById('monthTitle');
+            container.innerHTML = '';
+            
+            const year = viewDate.getFullYear();
+            const month = viewDate.getMonth();
+            title.innerText = `${year}年 ${month + 1}月`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) container.innerHTML += '<div></div>';
+
+            for (let d = 1; d <= daysInMonth; d++) {
+                const curr = new Date(year, month, d);
+                const cpr = isCPRRest(curr);
+                const qy = isQYRest(curr);
+                const sht = isSHTRest(curr);
+                const isAllRest = cpr && qy && sht;
+                const isHoli = holidays2026.includes(formatDate(curr));
+
+                let classes = 'day-card';
+                if (isAllRest) classes += ' rest-all';
+                if (isHoli) classes += ' is-holiday';
+                
+                container.innerHTML += `
+                    <div class="${classes}">
+                        <span class="z-10">${d}</span>
+                        ${isAllRest ? '<span class="extra-badge font-bold">🎉聚会</span>' : ''}
+                    </div>`;
+            }
+        }
+
+        renderCalendar();
+    </script>
+</body>
+</html>
