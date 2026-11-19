@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#fbf6ee">
+<title>六只小狗的聚会日</title>
+<style>
+  :root{
+    --bg:#fbf6ee;
+    --paper:#fffdf7;
+    --ink:#38324e;
+    --ink-soft:#655e7e;
+    --muted:#8d84a3;
+    --line:#ece5f4;
+    --line-2:#d8cfe8;
+    --gold:#f7c95c; --gold-2:#f4a45e; --gold-bg:#fdf2d9;
+    --sky:#8fb0ea; --mint:#7fc9b6; --lilac:#b9a4e6; --peach:#f3ab8c; --rose:#e88a9d;
+    --cpr:#6f8fd8; --sht:#a07bd4; --qy:#4fb3a3; --yy:#e0768d; --yq:#e29a5c; --dh:#7cb87a;
+    --shadow-card:0 12px 26px -20px rgba(56,50,78,.45), 0 3px 0 rgba(56,50,78,.05);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    min-height:100vh; color:var(--ink);
+    background:
+      radial-gradient(900px 420px at 50% -160px,#efe7ff 0%,rgba(239,231,255,0) 62%),
+      radial-gradient(700px 460px at 108% 96%,#e7f6ef 0%,rgba(231,246,239,0) 60%),
+      radial-gradient(560px 380px at -10% 70%,#fff0e0 0%,rgba(255,240,224,0) 60%),
+      var(--bg);
+    font-family:ui-rounded,system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    -webkit-tap-highlight-color:transparent;
+    padding-bottom:26px;
+  }
+  body::before{
+    content:""; position:fixed; inset:0; z-index:0; pointer-events:none;
+    background-image:radial-gradient(rgba(56,50,78,.05) 1px,transparent 1.4px);
+    background-size:20px 20px; opacity:.5;
+  }
+  ::selection{background:#ffe39b;color:var(--ink);}
+  button{touch-action:manipulation;}
+  button:focus-visible,select:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #b9a4e6;outline-offset:2px;}
+  .spark{position:fixed;z-index:0;pointer-events:none;color:#d9c9f2;font-size:14px;opacity:.8;}
+  .spark.s1{left:7%;top:13%;} .spark.s2{right:8%;top:24%;font-size:10px;} .spark.s3{right:13%;bottom:16%;font-size:9px;color:#f2c9b8;}
+  .wrap{position:relative;z-index:1;max-width:460px;margin:0 auto;padding:12px 16px 30px;}
+  h1,h2,h3,p{margin:0;}
+  h1{font-size:21px;font-weight:900;letter-spacing:.02em;line-height:1.3;}
+  .hint{font-size:10px;color:var(--muted);line-height:1.7;}
+  .hint.center{text-align:center;padding:14px 0;}
+
+  /* ---------- 头部 ---------- */
+  .hd{position:relative;text-align:center;padding:20px 0 8px;}
+  .hd-sticker{
+    display:inline-flex;align-items:center;justify-content:center;width:46px;height:46px;margin-bottom:10px;
+    border-radius:15px;border:2px solid var(--ink);background:linear-gradient(150deg,#fff4d6,#ffd9a4);
+    box-shadow:3px 3px 0 rgba(56,50,78,.15);font-size:21px;transform:rotate(-6deg);
+  }
+  .hd-sticker:active{transform:rotate(-6deg) scale(.96);}
+  .hl{background:linear-gradient(transparent 63%,#ffe39b 63%);padding:0 3px;border-radius:3px;}
+  .hd-sub{margin-top:9px;font-size:10px;letter-spacing:.13em;color:var(--muted);}
+  .hd::before,.hd::after{content:"✦";position:absolute;top:30px;color:var(--lilac);font-size:11px;}
+  .hd::before{left:13%;} .hd::after{right:13%;}
+
+  /* ---------- 卡片 ---------- */
+  .card{
+    position:relative;background:var(--paper);border:1.5px solid var(--line-2);border-radius:24px;
+    padding:15px;margin-top:14px;box-shadow:var(--shadow-card);
+  }
+  .card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;}
+  .card-head h3{font-size:13px;font-weight:900;letter-spacing:.01em;}
+  .card-head h3 span{background:linear-gradient(transparent 62%,#ffe9b3 62%);padding:0 2px;}
+  #nextCard h3 span{background:linear-gradient(transparent 62%,#ffe9b3 62%);padding:0 2px;}
+  .card-head .hint{flex:none;}
+  h3{font-size:13px;font-weight:900;}
+  .cal-card::before{
+    content:"";position:absolute;top:-9px;left:50%;transform:translateX(-50%) rotate(-2deg);
+    width:72px;height:17px;border-radius:3px;background:rgba(255,224,160,.8);
+    border:1px solid rgba(240,200,120,.9);box-shadow:0 2px 4px rgba(56,50,78,.07);
+  }
+
+  /* ---------- 今天 ---------- */
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;}
+  .chip{
+    display:inline-flex;align-items:center;gap:5px;background:#fff;border:1.5px solid var(--line-2);
+    border-radius:999px;padding:4px 9px;font-size:10px;color:var(--ink-soft);
+    box-shadow:0 2px 0 rgba(56,50,78,.05);white-space:nowrap;
+  }
+  .chip b{font-weight:900;color:var(--ink);}
+  .chip .dot{width:7px;height:7px;}
+
+  /* ---------- 最近可约 ---------- */
+  .next-main{
+    position:relative;display:flex;flex-direction:column;gap:6px;width:100%;text-align:left;
+    font-family:inherit;cursor:pointer;color:var(--ink);
+    border:2px solid var(--ink);border-radius:20px;padding:14px 16px;
+    background:#fff3d8;box-shadow:4px 4px 0 rgba(56,50,78,.12);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .next-main:active{transform:translate(2px,2px);box-shadow:2px 2px 0 rgba(56,50,78,.12);}
+  .next-main.all{background:linear-gradient(155deg,#ffe9ae,#ffc98d 68%,#ffb87e);}
+  .next-main .nm{font-size:18px;font-weight:900;letter-spacing:.01em;}
+  .next-main .nm small{font-size:11px;font-weight:800;color:#8a5a2b;margin-left:5px;letter-spacing:.02em;}
+  .next-main .when{font-size:10px;font-weight:600;color:#8a5a2b;}
+  .next-main::after{content:"✧";position:absolute;right:13px;top:10px;font-size:15px;color:#c58a3f;opacity:.85;}
+  #nextCard::after{
+    content:"NEXT";position:absolute;top:-8px;right:20px;transform:rotate(3deg);
+    font-size:7.5px;font-weight:900;letter-spacing:.16em;color:#a75f14;
+    background:#ffe9ae;border:1.5px solid #eeb06a;border-radius:999px;padding:2px 8px;
+    box-shadow:0 2px 0 rgba(56,50,78,.06);
+  }
+  .more{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:10px;font-size:10px;color:var(--muted);}
+  .mini{
+    border:1.5px solid var(--line-2);background:#fff;border-radius:999px;padding:3px 9px;
+    font:inherit;font-size:10px;font-weight:700;color:var(--ink-soft);cursor:pointer;
+    box-shadow:0 2px 0 rgba(56,50,78,.05);
+  }
+  .mini:active{transform:translateY(1px);}
+
+  /* ---------- 日历 ---------- */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px;}
+  .cal-head h2{font-size:16px;font-weight:900;letter-spacing:.01em;}
+  .nav{
+    width:34px;height:34px;border-radius:12px;border:2px solid var(--ink);background:#fff;color:var(--ink);
+    font-size:12px;cursor:pointer;box-shadow:2px 2px 0 rgba(56,50,78,.15);line-height:1;
+  }
+  .nav:active{transform:translate(1px,1px);box-shadow:1px 1px 0 rgba(56,50,78,.15);}
+  .weekdays{
+    display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center;
+    font-size:9px;font-weight:900;color:var(--muted);letter-spacing:.12em;margin-bottom:6px;
+  }
+  .days{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;}
+  .day{
+    position:relative;aspect-ratio:1/1;min-width:0;border:1.5px solid #f0eaf9;border-radius:14px;background:#fff;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:2px;
+    font-family:inherit;color:var(--ink);cursor:pointer;overflow:visible;
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .day:active{transform:scale(.95);}
+  .day.blank{border:0;background:transparent;cursor:default;box-shadow:none;}
+  .day .dnum{font-size:12.5px;font-weight:800;line-height:1;letter-spacing:0;}
+  .day .dots{display:grid;grid-template-columns:repeat(3,4px);grid-auto-rows:4px;gap:2px;justify-items:center;align-items:center;}
+  .dot{display:block;width:4px;height:4px;border-radius:50%;background:var(--c);flex:none;}
+  .dot.rest,.dot.free{background:var(--c);}
+  .dot.work{background:transparent;box-shadow:inset 0 0 0 1.5px var(--c);}
+  .dot.flex{background:var(--c);opacity:.36;}
+  .dot.muted{opacity:.22;}
+  .day .tag{
+    font-size:6.5px;font-weight:900;line-height:1.2;letter-spacing:.03em;color:#a75f14;
+    background:#fff8e8;border:1px solid #f0c987;border-radius:999px;padding:0 3px;
+  }
+  .day.all{
+    background:linear-gradient(150deg,#fff0c2,#ffd79b 62%,#ffc08b);
+    border-color:#eeb06a;
+    box-shadow:0 3px 0 rgba(238,176,106,.35), 0 8px 16px -10px rgba(238,176,106,.65);
+  }
+  .day.all .tag{background:#fffdf6;border-color:#eeb06a;}
+  .day.all::before{content:"✦";position:absolute;top:2px;right:4px;font-size:7px;color:#fff;opacity:.95;}
+  .day.soft{background:#fff9ec;border:1.5px dashed #ebc17f;}
+  .day.today{outline:2px dashed #8fb0ea;outline-offset:-3px;}
+  .day.today::after{content:"✦";position:absolute;bottom:1px;left:4px;font-size:7px;color:#7d9de0;}
+  .day.hol .dnum{color:#e2745f;}
+  .day.wkday .dnum{color:#5f9e8a;text-decoration:underline dotted;}
+  .cal-hint{margin-top:10px;}
+
+  /* ---------- 选择成员 ---------- */
+  .sel-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .sel-item{
+    display:flex;flex-direction:column;gap:3px;text-align:left;font-family:inherit;cursor:pointer;min-width:0;
+    border:1.5px solid var(--line-2);border-radius:14px;background:#fff;padding:8px 9px;
+    box-shadow:0 2px 0 rgba(56,50,78,.04);transition:transform .12s ease, border-color .12s ease;
+  }
+  .sel-item:active{transform:translateY(1px);}
+  .sel-top{display:flex;align-items:center;gap:6px;}
+  .sel-top .dot{width:9px;height:9px;flex:none;}
+  .sel-top b{font-size:11.5px;font-weight:900;line-height:1.2;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .sel-check{
+    width:15px;height:15px;border-radius:50%;border:1.5px solid var(--line-2);flex:none;
+    display:flex;align-items:center;justify-content:center;font-size:9px;line-height:1;color:#fff;font-weight:900;
+  }
+  .sel-item.on .sel-check{background:var(--ink);border-color:var(--ink);}
+  .sel-sub{font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding-left:15px;}
+  .sel-item.on{border-color:#cbbfe8;}
+  .sel-item.off{opacity:.55;border-style:dashed;}
+  .sel-actions{display:flex;align-items:center;gap:6px;margin-top:9px;flex-wrap:wrap;}
+  .sel-actions .hint{flex:1;min-width:110px;}
+
+  /* ---------- 本周全员排班 ---------- */
+  .wk-grid{display:flex;flex-direction:column;gap:3px;}
+  .wk-line{display:flex;align-items:center;gap:5px;padding:3px 4px;border-radius:10px;border:0;background:transparent;font-family:inherit;text-align:left;cursor:pointer;width:100%;}
+  .wk-line.on{background:#fffdf7;box-shadow:0 1px 0 rgba(56,50,78,.05);}
+  .wk-line.off{opacity:.5;}
+  .wk-head{padding:0 4px 3px;cursor:default;}
+  .wk-name{width:52px;flex:none;display:flex;align-items:center;gap:4px;font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .wk-name .dot{width:7px;height:7px;flex:none;}
+  .wk-cells{flex:1;display:grid;grid-template-columns:repeat(7,1fr);gap:3px;min-width:0;}
+  .wk-head .wk-cells span{text-align:center;font-size:8px;font-weight:900;color:var(--muted);line-height:1.15;}
+  .wk-head .wk-cells em{display:block;font-style:normal;font-size:9px;color:var(--ink-soft);}
+  .wk-cell{display:flex;align-items:center;justify-content:center;height:21px;border-radius:7px;font-size:9px;font-weight:900;background:#f7f4fb;color:#b7b0c7;}
+  .wk-cell.rest{background:#efeaf8;color:#4c4170;}
+  .wk-cell.flex{background:#fff6e4;color:#a9762a;}
+  .wk-cell.free{background:#eaf6ef;color:#3f7a51;}
+  .wk-cell.is-today{box-shadow:inset 0 0 0 1.5px #8fb0ea;}
+  .wk-head .is-today em{color:#5b7fd0;}
+
+  /* ---------- 玥玥周安排 ---------- */
+  .wk-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 0;border-bottom:1px dashed var(--line);}
+  .wk-row:last-child{border-bottom:0;}
+  .wk-row>span{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--ink-soft);white-space:nowrap;flex:none;}
+  .wk-row select{
+    flex:1;min-width:0;max-width:150px;border:1.5px solid var(--line-2);border-radius:11px;padding:6px 6px;
+    font-family:inherit;font-size:11px;font-weight:700;background:#fff;color:var(--ink);cursor:pointer;
+  }
+  .wk-row select.on{background:#eafaf4;border-color:#8ed4bf;color:#1f7a63;}
+  .now{font-style:normal;font-size:8px;font-weight:900;color:#8a6014;background:#fff0bf;border-radius:999px;padding:1px 5px;}
+
+  /* ---------- 表单 ---------- */
+  .form{display:grid;gap:8px;}
+  .row{display:flex;gap:7px;}
+  .row>*{flex:1;min-width:0;}
+  select,input[type=date],input[type=text]{
+    width:100%;min-width:0;border:1.5px solid var(--line-2);border-radius:12px;padding:9px 9px;
+    font-family:inherit;font-size:12px;background:#fff;color:var(--ink);
+  }
+  select:focus,input:focus{outline:3px solid #e6defa;outline-offset:-1px;border-color:#b9a4e6;}
+  .btn{
+    border:2px solid var(--ink);border-radius:14px;padding:10px;color:#fff;cursor:pointer;
+    background:linear-gradient(160deg,#a9c2f5,#b9a4e6);
+    font-weight:900;font-size:12px;font-family:inherit;letter-spacing:.03em;
+    box-shadow:3px 3px 0 rgba(56,50,78,.16);transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 rgba(56,50,78,.16);}
+  .btn.ghost{background:#fff;color:var(--ink);}
+  .btn.small{background:#fff8e8;color:#a75f14;border:1.5px solid #eec98a;box-shadow:2px 2px 0 rgba(56,50,78,.08);padding:7px 10px;font-size:11px;border-radius:10px;margin-right:6px;}
+  .btn.small.ghost{background:#fff;color:var(--ink-soft);border:1.5px solid var(--line-2);}
+  .err{font-size:10px;color:#d05a48;font-weight:700;}
+
+  /* ---------- 记录 ---------- */
+  .pill{
+    font-size:9px;background:#fff3d8;color:#9a6a22;border:1px solid #f0d9a8;border-radius:999px;
+    padding:2px 8px;font-weight:900;white-space:nowrap;
+  }
+  .log-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 0;border-bottom:1px dashed var(--line);}
+  .log-row:last-child{border-bottom:0;}
+  .log-row b{font-size:11px;margin-right:5px;}
+  .log-row small{display:block;font-size:9px;color:var(--muted);margin-top:3px;}
+  .badge{display:inline-block;font-size:9px;font-weight:900;border-radius:999px;padding:1px 7px;background:#f3eefb;color:#6a5b8f;border:1px solid #e3d9f3;}
+  .badge.red{background:#fdeceb;color:#b0503f;border-color:#f4d0c8;}
+  .badge.green{background:#e8f7f0;color:#2b7d64;border-color:#c8ebdd;}
+  .del{border:0;background:transparent;color:#d98a8a;font-size:15px;line-height:1;padding:6px 8px;cursor:pointer;font-family:inherit;}
+
+  /* ---------- 规则 ---------- */
+  details summary{font-size:13px;font-weight:900;cursor:pointer;list-style:none;}
+  details summary::-webkit-details-marker{display:none;}
+  details summary::after{content:" ▾";color:var(--muted);}
+  details[open] summary::after{content:" ▴";}
+  .rule{padding:10px 0;border-bottom:1px dashed var(--line);font-size:11px;color:var(--ink-soft);line-height:1.75;}
+  .rule:last-of-type{border-bottom:0;}
+  .rule b{color:var(--ink);font-size:11.5px;}
+  .rule p{margin:2px 0;}
+  .pat-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin:8px 0 5px;}
+  .pat{
+    border:1.5px solid var(--line-2);border-radius:9px;background:#fff;padding:4px 0;font-family:inherit;
+    cursor:pointer;line-height:1.15;color:var(--ink-soft);box-shadow:0 1px 0 rgba(56,50,78,.04);
+  }
+  .pat small{display:block;font-size:7px;color:var(--muted);}
+  .pat b{display:block;font-size:10px;}
+  .pat.rest{background:#fdf1dc;border-color:#eec98a;color:#a75f14;}
+  .pat.work{background:#eef4ff;border-color:#c9d9f7;color:#4a6da8;}
+
+  /* ---------- 弹层 ---------- */
+  .modal{position:fixed;inset:0;z-index:60;background:rgba(56,50,78,.42);display:flex;align-items:flex-end;justify-content:center;}
+  .modal[hidden]{display:none;}
+  .sheet{
+    width:100%;max-width:460px;max-height:82vh;overflow:auto;background:var(--paper);
+    border:2px solid var(--ink);border-bottom:0;border-radius:26px 26px 0 0;
+    padding:14px 16px calc(26px + env(safe-area-inset-bottom,0px));
+    box-shadow:0 -14px 40px -14px rgba(56,50,78,.4);overscroll-behavior:contain;
+  }
+  .sheet::before{content:"";display:block;width:44px;height:4px;border-radius:999px;background:#d9cfe9;margin:-2px auto 12px;}
+  .sheet-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;}
+  .sheet-head h3{font-size:15px;line-height:1.4;}
+  .close{border:1.5px solid var(--line-2);background:#fff;color:var(--ink-soft);width:28px;height:28px;border-radius:50%;font-size:12px;cursor:pointer;flex:none;box-shadow:0 2px 0 rgba(56,50,78,.05);}
+  .mrow{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:1px dashed var(--line);}
+  .mrow:last-of-type{border-bottom:0;}
+  .mrow>.dot{width:9px;height:9px;flex:none;}
+  .mrow b{font-size:12px;min-width:44px;font-weight:900;}
+  .mrow .sv{font-size:11px;font-weight:800;color:var(--ink);}
+  .mrow small{font-size:9px;color:var(--muted);margin-left:auto;text-align:right;}
+  .mrow.off{opacity:.45;}
+  .mrow-note{font-size:10px;color:#b0503f;font-weight:700;margin-bottom:4px;}
+  .quick{margin-top:12px;padding-top:12px;border-top:1px dashed var(--line);}
+  .quick p{font-size:11px;color:var(--ink-soft);margin-bottom:7px;font-weight:700;}
+  .quick .btn{margin-right:6px;}
+
+  .foot{text-align:center;font-size:9px;color:#c2bad2;margin-top:18px;letter-spacing:.04em;}
+
+  @media (max-width:360px){
+    .wrap{padding:12px 12px 26px;}
+    .card{padding:13px;border-radius:20px;}
+    .days{gap:5px;} .day{border-radius:12px;}
+    .day .dnum{font-size:11.5px;}
+    .day .tag{font-size:6px;padding:0 2px;}
+    .lg{padding:6px 7px;}
+    .lg small{font-size:8px;}
+    .wk-row>span{font-size:10px;}
+    .wk-row select{max-width:130px;}
+    .hd h1{font-size:19px;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none !important;transition:none !important;}
+  }
+
+</style>
+</head>
+<body>
+<span class="spark s1" aria-hidden="true">✦</span>
+<span class="spark s2" aria-hidden="true">✦</span>
+<span class="spark s3" aria-hidden="true">✧</span>
+<div class="wrap">
+  <header class="hd">
+    <div class="hd-sticker" aria-hidden="true">🐾</div>
+    <h1>六只小狗的<span class="hl">聚会日</span></h1>
+    <p class="hd-sub">老陈 · 童童 · 玥玥 · 媛媛 · 钰琪 · 段博士</p>
+  </header>
+
+  <section class="card" id="todayCard"></section>
+
+  <section class="card sel-card">
+    <div class="card-head"><h3>🎪 <span>这次谁参加</span></h3><span class="pill" id="selCount">已选 6 人</span></div>
+    <div class="sel-grid" id="selGrid"></div>
+    <div class="sel-actions">
+      <button type="button" class="btn small" id="selAll">全选</button>
+      <button type="button" class="btn small ghost" id="selNone">清空</button>
+      <span class="hint" id="selHint">日历只按所选成员计算</span>
+    </div>
+    <p class="hint" style="margin-top:8px">● 有空　○ 上班　◐ 可调休　·　点成员切换是否参加</p>
+  </section>
+
+  <section class="card" id="nextCard"></section>
+
+  <section class="card cal-card">
+    <div class="cal-head">
+      <button type="button" class="nav" id="prevMonth" aria-label="上个月">◀</button>
+      <h2 id="monthTitle"></h2>
+      <button type="button" class="nav" id="nextMonth" aria-label="下个月">▶</button>
+    </div>
+    <div class="weekdays">
+      <span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span>
+    </div>
+    <div class="days" id="calendarDays"></div>
+    <p class="hint cal-hint" id="calHint">金色 = 所选成员都有空 · 浅金虚线 = 只差玥玥选休 · 点日期看详情</p>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h3>📊 <span>本周全员排班</span></h3><span class="pill" id="weekRange"></span></div>
+    <div class="wk-grid" id="weekGrid"></div>
+    <p class="hint" style="margin-top:8px">所有成员都在这里；点人名可加入 / 移出本次聚会</p>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h3>📅 <span>玥玥的连休安排</span></h3><span class="hint">周六日上班</span></div>
+    <p class="hint" style="margin-bottom:6px">每周在周一~周五里选连续 2 天休息，选完日历会重算。</p>
+    <div id="qyWeeks"></div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h3>✍️ <span>手动调整</span></h3><span class="hint">临时换班 / 请假</span></div>
+    <div class="form">
+      <select id="ovName" aria-label="成员"></select>
+      <div class="row">
+        <select id="ovType" aria-label="类型">
+          <option value="rest">休息</option>
+          <option value="work">上班</option>
+        </select>
+        <input type="date" id="ovStart" aria-label="开始日期">
+        <input type="date" id="ovEnd" aria-label="结束日期">
+      </div>
+      <button type="button" class="btn" id="ovAdd">添加调整</button>
+      <p class="err" id="ovErr" hidden></p>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-head"><h3>🕒 <span>变动记录</span></h3><span class="pill" id="logCount">0 条</span></div>
+    <div id="logList"></div>
+  </section>
+
+  <section class="card">
+    <details>
+      <summary>📖 规则与假设</summary>
+      <div id="rulesBody"></div>
+    </details>
+  </section>
+
+  <p class="foot">✧ 数据只保存在本机浏览器 · 换设备 / 清缓存会丢失 ✧</p>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="sheet-head">
+      <h3 id="mTitle"></h3>
+      <button type="button" class="close" id="mClose" aria-label="关闭">✕</button>
+    </div>
+    <div id="mBody"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ============================================================
+   * 基础工具
+   * ============================================================ */
+  const $ = (s) => document.querySelector(s);
+  const pad = (n) => String(n).padStart(2, '0');
+  const fmt = (d) => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const fmtMD = (d) => `${d.getMonth() + 1}月${d.getDate()}日`;
+  const WD = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
+  const startOfDay = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  let today = startOfDay(new Date());
+  let todayStr = fmt(today);
+  const diffDays = (a, b) => Math.round((startOfDay(a) - startOfDay(b)) / 86400000);
+  const mod = (n, m) => ((n % m) + m) % m;
+  const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+  const weekStart = (d) => addDays(d, -((d.getDay() + 6) % 7)); // 周一为一周开始
+  const uid = () => (window.crypto && crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
+
+  /* ============================================================
+   * 成员与规则基准（2026-11-19 = 老陈 8 天周期第 1 天 = 媛媛休息第 1 天）
+   * ============================================================ */
+  const MEMBERS = [
+    { id: 'cpr', nick: '老陈',   name: '陈沛冉', color: '#4a6fbf', short: '8天轮换' },
+    { id: 'sht', nick: '童童',   name: '申浩童', color: '#8358bb', short: '单双周轮休' },
+    { id: 'qy',  nick: '玥玥',   name: '秦玥',   color: '#2f8e80', short: '工作日选休2天' },
+    { id: 'yy',  nick: '媛媛',   name: '阴媛',   color: '#cc5a74', short: '上1休2' },
+    { id: 'yq',  nick: '钰琪',   name: '冯钰琪', color: '#cc7d3d', short: '随时有空' },
+    { id: 'dh',  nick: '段博士', name: '段浩瑜', color: '#4f9950', short: '随时有空' }
+  ];
+  const MEMBER_BY_ID = Object.fromEntries(MEMBERS.map((m) => [m.id, m]));
+
+  const CPR_ANCHOR = new Date(2026, 10, 19);   // 老陈 8 天周期第 1 天（白班）
+  const YY_ANCHOR  = new Date(2026, 10, 19);   // 媛媛 休息第 1 天
+  const SHT_ANCHOR = new Date(2026, 10, 16);   // 童童 本周（周一起）休周六日
+  const DEFAULT_CPR_PATTERN = [false, false, true, false, false, true, true, true]; // true = 休息
+
+  const QY_PAIRS = [[1, 2], [2, 3], [3, 4], [4, 5]];
+  const QY_LABELS = ['周一·周二', '周二·周三', '周三·周四', '周四·周五'];
+
+  const HOLIDAYS_2026 = new Set(['2026-01-01','2026-01-02','2026-01-03','2026-02-15','2026-02-16','2026-02-17','2026-02-18','2026-02-19','2026-02-20','2026-02-21','2026-02-22','2026-02-23','2026-04-04','2026-04-05','2026-04-06','2026-05-01','2026-05-02','2026-05-03','2026-05-04','2026-05-05','2026-06-19','2026-06-20','2026-06-21','2026-09-25','2026-09-26','2026-09-27','2026-10-01','2026-10-02','2026-10-03','2026-10-04','2026-10-05','2026-10-06','2026-10-07']);
+  const WORKDAYS_2026 = new Set(['2026-01-04','2026-02-14','2026-02-28','2026-05-09','2026-09-20','2026-10-10']);
+
+  /* ============================================================
+   * 本地存储
+   * ============================================================ */
+  const K = { ov: 'dogParty_v2_overrides', qy: 'dogParty_v2_qyWeeks', cpr: 'dogParty_v2_cprPattern', sel: 'dogParty_v2_selected' };
+  const readJSON = (key, fb) => { try { const raw = localStorage.getItem(key); return raw === null ? fb : JSON.parse(raw); } catch (e) { return fb; } };
+  const writeJSON = (key, v) => { try { localStorage.setItem(key, JSON.stringify(v)); } catch (e) {} };
+
+  const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+  const MEMBER_IDS = new Set(MEMBERS.map((m) => m.id));
+  const validDate = (s) => {
+    if (typeof s !== 'string' || !ISO_DATE.test(s)) return false;
+    const d = new Date(`${s}T00:00:00`);
+    return !isNaN(d.getTime()) && fmt(d) === s;
+  };
+  const hasKey = (k) => { try { return localStorage.getItem(k) !== null; } catch (e) { return false; } };
+
+  function sanitizeOverrides(list) {
+    if (!Array.isArray(list)) return [];
+    const out = [];
+    list.forEach((o) => {
+      if (!o || typeof o !== 'object') return;
+      if (!MEMBER_IDS.has(o.name)) return;
+      if (o.type !== 'rest' && o.type !== 'work') return;
+      if (!validDate(o.start)) return;
+      const end = validDate(o.end) && o.end >= o.start ? o.end : o.start;
+      out.push({ id: String(o.id || uid()), name: o.name, type: o.type, start: o.start, end });
+    });
+    return out;
+  }
+
+  function sanitizeQyWeeks(obj) {
+    const out = {};
+    if (!obj || typeof obj !== 'object' || Array.isArray(obj)) return out;
+    Object.keys(obj).forEach((k) => {
+      const v = Number(obj[k]);
+      if (validDate(k) && v >= 1 && v <= 4) out[k] = v;
+    });
+    return out;
+  }
+
+  function migrateV1() {
+    try {
+      const old = JSON.parse(localStorage.getItem('threeFriends_Rests') || 'null');
+      if (!Array.isArray(old) || !old.length) return [];
+      const map = { CPR: 'cpr', QY: 'qy', SHT: 'sht' };
+      const out = sanitizeOverrides(old.map((o) => (o && map[o.name] ? { id: o.id, name: map[o.name], type: 'rest', start: o.start, end: o.end || o.start } : null)));
+      if (out.length) writeJSON(K.ov, out);
+      return out;
+    } catch (e) { return []; }
+  }
+
+  let overrides = sanitizeOverrides(readJSON(K.ov, null));
+  if (!overrides.length && !hasKey(K.ov)) overrides = migrateV1();
+
+  let qyWeeks = sanitizeQyWeeks(readJSON(K.qy, {}));
+
+  let cprPattern = readJSON(K.cpr, null);
+  if (!Array.isArray(cprPattern) || cprPattern.length !== 8 || !cprPattern.every((v) => typeof v === 'boolean')) {
+    cprPattern = DEFAULT_CPR_PATTERN.slice();
+  }
+
+  let selected = readJSON(K.sel, null);
+  if (!Array.isArray(selected)) selected = MEMBERS.map((m) => m.id);
+  selected = Array.from(new Set(selected.filter((id) => MEMBER_IDS.has(id))));
+
+  /* ============================================================
+   * 规则计算
+   * ============================================================ */
+  const cprInfo = (date) => { const n = mod(diffDays(date, CPR_ANCHOR), 8) + 1; return { n, rest: !!cprPattern[n - 1] }; };
+
+  const shtInfo = (date) => {
+    const wd = date.getDay();
+    const wk = Math.round(diffDays(weekStart(date), SHT_ANCHOR) / 7);
+    const even = mod(wk, 2) === 0;
+    return { even, rest: even ? (wd === 0 || wd === 6) : (wd === 4 || wd === 5) };
+  };
+
+  const yyInfo = (date) => { const n = mod(diffDays(date, YY_ANCHOR), 3); return { n, rest: n !== 2 }; };
+
+  const qyWindowIdx = (date) => {
+    const v = qyWeeks[fmt(weekStart(date))];
+    return (typeof v === 'number' && v >= 1 && v <= 4) ? v : 0;
+  };
+
+  const qyInfo = (date) => {
+    const wd = date.getDay();
+    if (wd === 0 || wd === 6) return { state: 'work', note: '周六日上班' };
+    const w = qyWindowIdx(date);
+    if (w) return { state: QY_PAIRS[w - 1].includes(wd) ? 'rest' : 'work', note: `本周连休 ${QY_LABELS[w - 1]}` };
+    return { state: 'flex', note: '工作日可自选连休' };
+  };
+
+  function baseState(member, date) {
+    switch (member.id) {
+      case 'cpr': { const i = cprInfo(date); return { state: i.rest ? 'rest' : 'work', note: `8天周期第${i.n}天${i.n === 1 ? '（白班）' : ''}` }; }
+      case 'sht': { const i = shtInfo(date); return { state: i.rest ? 'rest' : 'work', note: i.even ? '本周休周六日' : '本周休周四五' }; }
+      case 'qy':  return qyInfo(date);
+      case 'yy':  { const i = yyInfo(date); return { state: i.rest ? 'rest' : 'work', note: i.rest ? (i.n === 0 ? '连休第1天' : '连休第2天') : '上班日' }; }
+      default:     return { state: 'free', note: '随时有空' };
+    }
+  }
+
+  function overrideFor(id, ds) {
+    for (let i = 0; i < overrides.length; i++) {
+      const o = overrides[i];
+      if (o && o.name === id && ds >= o.start && ds <= o.end) return o;
+    }
+    return null;
+  }
+
+  function stateFor(member, date) {
+    const base = baseState(member, date);
+    const ov = overrideFor(member.id, fmt(date));
+    if (ov) return { state: ov.type === 'work' ? 'work' : 'rest', note: '手动调整', manual: true };
+    return base;
+  }
+
+  // 返回 'all'（所选成员都有空）/ 'soft'（只差可调休的人选休）/ ''
+  function evaluate(date) {
+    if (selected.length === 0) return '';
+    let flex = 0;
+    for (const m of MEMBERS) {
+      if (!selected.includes(m.id)) continue;
+      const s = stateFor(m, date).state;
+      if (s === 'flex') { flex++; continue; }
+      if (s !== 'rest' && s !== 'free') return '';
+    }
+    if (flex === 0) return 'all';
+    if (flex === 1) return 'soft';
+    return '';
+  }
+
+  const stateText = (s) => (s === 'rest' ? '休' : s === 'free' ? '有空' : s === 'flex' ? '可调休' : '班');
+  const dotHTML = (m, st, muted) => `<i class="dot ${st.state}${muted ? ' muted' : ''}" style="--c:${m.color}"></i>`;
+
+  /* ============================================================
+   * 视图状态
+   * ============================================================ */
+  let viewDate = new Date(today.getFullYear(), today.getMonth(), 1);
+  let modalDate = null;
+
+  /* ============================================================
+   * 渲染：今天
+   * ============================================================ */
+  function renderToday() {
+    const chips = MEMBERS.map((m) => {
+      const st = stateFor(m, today);
+      return `<span class="chip"><i class="dot ${st.state}" style="--c:${m.color}"></i><b>${m.nick}</b>${todayLabel(m)}</span>`;
+    }).join('');
+    let tag = '';
+    if (HOLIDAYS_2026.has(todayStr)) tag = '<span class="badge red">法定假日</span>';
+    else if (WORKDAYS_2026.has(todayStr)) tag = '<span class="badge">补班日</span>';
+    $('#todayCard').innerHTML = `<div class="card-head"><h3>☀️ <span>今天 · ${fmtMD(today)} ${WD[today.getDay()]}</span></h3>${tag}</div><div class="chips">${chips}</div>`;
+  }
+
+  /* ============================================================
+   * 渲染：最近可约
+   * ============================================================ */
+  function renderNext() {
+    if (selected.length === 0) {
+      $('#nextCard').innerHTML = `<h3>🎯 <span>最近可约</span></h3><p class="hint" style="margin-top:6px">还没有选择参与成员，先在上方「这次谁参加」里选人。</p>`;
+      return;
+    }
+    const found = [];
+    for (let i = 0; i < 400 && found.length < 5; i++) {
+      const d = addDays(today, i);
+      const info = evaluate(d);
+      if (info) found.push({ d, info });
+    }
+    if (found.length === 0) {
+      $('#nextCard').innerHTML = `<h3>🎯 <span>最近可约</span></h3><p class="hint" style="margin-top:6px">近一年内，所选成员没有同时有空的日期。</p>`;
+      return;
+    }
+    const first = found[0];
+    const n = diffDays(first.d, today);
+    const when = n === 0 ? '就是今天' : `还有 ${n} 天`;
+    const sub = first.info === 'soft' ? `玥玥选休即可（所选 ${selected.length} 人）` : `所选 ${selected.length} 人都有空`;
+    const more = found.slice(1, 4).map((f) => `<button type="button" class="mini" data-date="${fmt(f.d)}">${f.d.getMonth() + 1}/${f.d.getDate()} ${WD[f.d.getDay()]}</button>`).join('');
+    $('#nextCard').innerHTML =
+      `<h3>🎯 <span>最近可约</span></h3>
+       <button type="button" class="next-main ${first.info}" data-date="${fmt(first.d)}" style="margin-top:8px">
+         <span class="nm">${fmtMD(first.d)}<small>${WD[first.d.getDay()]}</small></span>
+         <span class="when">${when} · ${sub}</span>
+       </button>
+       ${more ? `<div class="more"><span>之后：</span>${more}</div>` : ''}`;
+  }
+
+  /* ============================================================
+   * 渲染：日历
+   * ============================================================ */
+  function renderCalendar() {
+    const y = viewDate.getFullYear();
+    const m = viewDate.getMonth();
+    $('#monthTitle').textContent = `${y}年 ${m + 1}月`;
+    const firstDay = new Date(y, m, 1).getDay();
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    const parts = [];
+    for (let i = 0; i < firstDay; i++) parts.push('<div class="day blank" aria-hidden="true"></div>');
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(y, m, d);
+      const ds = fmt(date);
+      const info = evaluate(date);
+      const cls = ['day'];
+      if (info === 'all') cls.push('all');
+      if (info === 'soft') cls.push('soft');
+      if (ds === todayStr) cls.push('today');
+      if (HOLIDAYS_2026.has(ds)) cls.push('hol');
+      if (WORKDAYS_2026.has(ds)) cls.push('wkday');
+      const dots = MEMBERS.map((m2) => dotHTML(m2, stateFor(m2, date), !selected.includes(m2.id))).join('');
+      const tag = info === 'all' ? '<span class="tag">聚</span>' : info === 'soft' ? '<span class="tag">可约</span>' : '';
+      const label = `${date.getMonth() + 1}月${d}日 ${WD[date.getDay()]}${info === 'all' ? '，所选成员都有空' : info === 'soft' ? '，可约（玥玥待定）' : ''}`;
+      parts.push(`<button type="button" class="${cls.join(' ')}" data-date="${ds}" aria-label="${label}"><span class="dnum">${d}</span><span class="dots">${dots}</span>${tag}</button>`);
+    }
+    $('#calendarDays').innerHTML = parts.join('');
+    $('#calHint').textContent = selected.length
+      ? `金色 = 所选 ${selected.length} 人都有空 · 浅金虚线 = 只差玥玥选休 · 点日期看详情`
+      : '还没有选择参与成员 · 在上方「这次谁参加」里点选，或点「全选」';
+  }
+
+  /* ============================================================
+   * 渲染：参与成员选择
+   * ============================================================ */
+  function todayLabel(m) {
+    if (m.id === 'yy') {
+      const st = stateFor(m, today);
+      if (st.state === 'work') return '班';
+      const i = yyInfo(today);
+      return i.n === 0 ? '休①' : '休②';
+    }
+    return stateText(stateFor(m, today).state);
+  }
+
+  function renderSelection() {
+    $('#selGrid').innerHTML = MEMBERS.map((m) => {
+      const on = selected.includes(m.id);
+      return `<button type="button" class="sel-item ${on ? 'on' : 'off'}" data-id="${m.id}" aria-pressed="${on}">
+        <span class="sel-top"><i class="dot" style="--c:${m.color}"></i><b>${m.nick}</b><span class="sel-check">${on ? '✓' : ''}</span></span>
+        <span class="sel-sub">今天 ${todayLabel(m)} · ${m.short}</span>
+      </button>`;
+    }).join('');
+    $('#selCount').textContent = selected.length ? `已选 ${selected.length} 人` : '未选';
+    $('#selHint').textContent = selected.length ? '日历与「最近可约」只按所选成员计算' : '至少选 1 人才会显示可约日';
+  }
+
+  /* ============================================================
+   * 渲染：本周全员排班
+   * ============================================================ */
+  function renderWeekGrid() {
+    const mon = weekStart(today);
+    const days = Array.from({ length: 7 }, (_, i) => addDays(mon, i));
+    const head = days.map((d) => `<span class="${fmt(d) === todayStr ? 'is-today' : ''}">${WD[d.getDay()].replace('周', '')}<em>${d.getDate()}</em></span>`).join('');
+    const lines = MEMBERS.map((m) => {
+      const on = selected.includes(m.id);
+      const cells = days.map((d) => {
+        const st = stateFor(m, d);
+        const txt = st.state === 'rest' ? '休' : st.state === 'free' ? '空' : st.state === 'flex' ? '可' : '班';
+        return `<span class="wk-cell ${st.state}${fmt(d) === todayStr ? ' is-today' : ''}">${txt}</span>`;
+      }).join('');
+      return `<button type="button" class="wk-line ${on ? 'on' : 'off'}" data-id="${m.id}" aria-pressed="${on}" aria-label="${m.nick}，点击${on ? '移出' : '加入'}本次聚会"><span class="wk-name"><i class="dot" style="--c:${m.color}"></i>${m.nick}</span><span class="wk-cells">${cells}</span></button>`;
+    }).join('');
+    const sun = addDays(mon, 6);
+    $('#weekRange').textContent = `${mon.getMonth() + 1}/${mon.getDate()} – ${sun.getMonth() + 1}/${sun.getDate()}`;
+    $('#weekGrid').innerHTML = `<div class="wk-line wk-head"><span class="wk-name"></span><span class="wk-cells">${head}</span></div>` + lines;
+  }
+
+  /* ============================================================
+   * 渲染：玥玥每周连休
+   * ============================================================ */
+  function renderQyWeeks() {
+    const y = viewDate.getFullYear();
+    const m = viewDate.getMonth();
+    const last = new Date(y, m + 1, 0);
+    let mon = weekStart(new Date(y, m, 1));
+    const rows = [];
+    let guard = 0;
+    while (mon <= last && guard++ < 8) {
+      const sun = addDays(mon, 6);
+      const key = fmt(mon);
+      const cur = typeof qyWeeks[key] === 'number' ? qyWeeks[key] : 0;
+      const isThisWeek = fmt(mon) === fmt(weekStart(today));
+      const opts = ['<option value="0"' + (cur === 0 ? ' selected' : '') + '>待定</option>']
+        .concat(QY_LABELS.map((L, i) => `<option value="${i + 1}"${cur === i + 1 ? ' selected' : ''}>${L}</option>`)).join('');
+      rows.push(`<div class="wk-row"><span>${mon.getMonth() + 1}/${mon.getDate()} – ${sun.getMonth() + 1}/${sun.getDate()}${isThisWeek ? '<em class="now">本周</em>' : ''}</span><select class="${cur ? 'on' : ''}" data-wk="${key}" aria-label="玥玥 ${mon.getMonth() + 1}/${mon.getDate()} 那周的连休">${opts}</select></div>`);
+      mon = addDays(mon, 7);
+    }
+    $('#qyWeeks').innerHTML = rows.join('');
+  }
+
+  /* ============================================================
+   * 渲染：变动记录
+   * ============================================================ */
+  function renderLog() {
+    const list = overrides.slice().reverse();
+    $('#logCount').textContent = `${list.length} 条`;
+    if (!list.length) { $('#logList').innerHTML = '<p class="hint center">暂无手动调整</p>'; return; }
+    $('#logList').innerHTML = list.map((o) => {
+      const m = MEMBER_BY_ID[o.name];
+      if (!m) return '';
+      const type = o.type === 'work' ? '<span class="badge">上班</span>' : '<span class="badge green">休息</span>';
+      const range = o.start === o.end ? o.start : `${o.start} ~ ${o.end}`;
+      return `<div class="log-row"><div><b>${m.nick}</b>${type}<small>${range}</small></div><button type="button" class="del" data-del="${o.id}" aria-label="删除">✕</button></div>`;
+    }).join('');
+  }
+
+  /* ============================================================
+   * 渲染：规则与假设
+   * ============================================================ */
+  function renderRules() {
+    const chips = cprPattern.map((rest, i) =>
+      `<button type="button" class="pat ${rest ? 'rest' : 'work'}" data-pat="${i}" aria-label="老陈第 ${i + 1} 天${rest ? '休息' : '上班'}"><small>第${i + 1}天</small><b>${rest ? '休' : '班'}</b></button>`).join('');
+    $('#rulesBody').innerHTML = `
+      <div class="rule"><b>老陈（陈沛冉）</b>
+        <p>8 天轮换：以 <b>2026-11-19</b> 为第 1 天（白班），默认第 3 / 6 / 7 / 8 天休息。</p>
+        <div class="pat-grid">${chips}</div>
+        <p class="hint">点格子可改成实际班表（按「换了个班、今天为周期第 1 天」推断，若不对请直接改）。</p>
+      </div>
+      <div class="rule"><b>童童（申浩童）</b>
+        <p>单双周轮休：以 <b>2026-11-16</b> 所在周为基准，该周休<b>周六日</b>，隔周休<b>周四五</b>。</p>
+      </div>
+      <div class="rule"><b>玥玥（秦玥）</b>
+        <p>周六日上班；每周可在周一~周五中自选<b>连续 2 天</b>休息。未登记的一周显示为「可调休」。</p>
+      </div>
+      <div class="rule"><b>媛媛（阴媛）</b>
+        <p>上 1 休 2：<b>11/19 休①</b> → <b>11/20 休②</b> → <b>11/21 上班</b> → 11/22 休① …… 3 天一个循环，从 2026-11-19 起算。</p>
+      </div>
+      <div class="rule"><b>钰琪（冯钰琪）· 段博士（段浩瑜）</b>
+        <p>随时有空。</p>
+      </div>
+      <p class="hint" style="margin-top:8px">「这次谁参加」可自由勾选任意成员，日历金标与「最近可约」只按所选成员计算；未选的成员依然会显示在日历圆点和本周排班表里。</p>
+      <p class="hint" style="margin-top:6px">日历上的红字 = 2026 法定节假日，下划虚线 = 补班日，仅作参考，不参与排班计算。</p>
+      <button type="button" class="btn ghost" id="resetAll" style="margin-top:10px">清空本机数据（设置与手动记录）</button>`;
+  }
+
+  /* ============================================================
+   * 渲染：日期详情
+   * ============================================================ */
+  function renderModal() {
+    if (!modalDate) return;
+    const date = modalDate;
+    const ds = fmt(date);
+    const info = evaluate(date);
+    const rows = MEMBERS.map((m) => {
+      const st = stateFor(m, date);
+      const on = selected.includes(m.id);
+      return `<div class="mrow ${on ? '' : 'off'}">${dotHTML(m, st)}<b>${m.nick}</b><span class="sv">${stateText(st.state)}</span><small>${on ? st.note : `未选 · ${st.note}`}</small></div>`;
+    }).join('');
+    let extra = '';
+    if (info === 'soft') {
+      const wd = date.getDay();
+      const cand = wd === 1 ? [1] : wd === 2 ? [1, 2] : wd === 3 ? [2, 3] : wd === 4 ? [3, 4] : wd === 5 ? [4] : [];
+      extra = `<div class="quick"><p>让玥玥本周选休：</p>${cand.map((p) => `<button type="button" class="btn small" data-qypair="${p}" data-week="${fmt(weekStart(date))}">${QY_LABELS[p - 1]}</button>`).join('')}</div>`;
+    }
+    const suffix = info === 'all' ? ` · 所选 ${selected.length} 人都有空` : info === 'soft' ? ' · 可约（玥玥待定）' : '';
+    $('#mTitle').textContent = `${fmtMD(date)} ${WD[date.getDay()]}${suffix}`;
+    const note = HOLIDAYS_2026.has(ds) ? '<div class="mrow-note">法定节假日</div>' : WORKDAYS_2026.has(ds) ? '<div class="mrow-note" style="color:#64748b">补班日</div>' : '';
+    $('#mBody').innerHTML = note + rows + extra;
+  }
+
+  /* ============================================================
+   * 刷新
+   * ============================================================ */
+  function refresh() {
+    renderToday();
+    renderSelection();
+    renderNext();
+    renderCalendar();
+    renderWeekGrid();
+    renderQyWeeks();
+    renderLog();
+    if (modalDate) renderModal();
+  }
+
+  /* ============================================================
+   * 事件
+   * ============================================================ */
+  $('#prevMonth').addEventListener('click', () => { viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1); refresh(); });
+  $('#nextMonth').addEventListener('click', () => { viewDate = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 1); refresh(); });
+
+  document.addEventListener('click', (e) => {
+    const el = e.target.closest('[data-date]');
+    if (!el) return;
+    openDay(el.dataset.date, el);
+  });
+
+  let lastDayBtn = null;
+  function openDay(ds, fromEl) {
+    lastDayBtn = fromEl && fromEl.matches && fromEl.matches('[data-date]') ? fromEl
+      : (document.activeElement && document.activeElement.matches && document.activeElement.matches('[data-date]') ? document.activeElement : null);
+    const [y, m, d] = ds.split('-').map(Number);
+    modalDate = new Date(y, m - 1, d);
+    renderModal();
+    $('#modal').hidden = false;
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => { try { $('#mClose').focus(); } catch (e) {} }, 30);
+  }
+  function closeModal() {
+    $('#modal').hidden = true;
+    document.body.style.overflow = '';
+    modalDate = null;
+    if (lastDayBtn && document.contains(lastDayBtn)) { try { lastDayBtn.focus(); } catch (e) {} }
+    lastDayBtn = null;
+  }
+  $('#mClose').addEventListener('click', closeModal);
+  $('#modal').addEventListener('click', (e) => { if (e.target.id === 'modal') closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && !$('#modal').hidden) closeModal(); });
+
+  function toggleMember(id) {
+    if (selected.includes(id)) selected = selected.filter((x) => x !== id);
+    else selected.push(id);
+    writeJSON(K.sel, selected);
+    refresh();
+  }
+
+  $('#selGrid').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-id]');
+    if (b) toggleMember(b.dataset.id);
+  });
+
+  $('#weekGrid').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-id]');
+    if (b) toggleMember(b.dataset.id);
+  });
+
+  $('#selAll').addEventListener('click', () => {
+    selected = MEMBERS.map((m) => m.id);
+    writeJSON(K.sel, selected);
+    refresh();
+  });
+
+  $('#selNone').addEventListener('click', () => {
+    selected = [];
+    writeJSON(K.sel, selected);
+    refresh();
+  });
+
+  $('#mBody').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-qypair]');
+    if (!b) return;
+    qyWeeks[b.dataset.week] = Number(b.dataset.qypair);
+    writeJSON(K.qy, qyWeeks);
+    refresh();
+  });
+
+  $('#qyWeeks').addEventListener('change', (e) => {
+    const s = e.target.closest('select[data-wk]');
+    if (!s) return;
+    const v = Number(s.value);
+    if (v) qyWeeks[s.dataset.wk] = v;
+    else delete qyWeeks[s.dataset.wk];
+    writeJSON(K.qy, qyWeeks);
+    refresh();
+  });
+
+  $('#ovName').innerHTML = MEMBERS.map((m) => `<option value="${m.id}">${m.nick}（${m.name}）</option>`).join('');
+  const showErr = (msg) => { const p = $('#ovErr'); if (!msg) { p.hidden = true; p.textContent = ''; } else { p.hidden = false; p.textContent = msg; } };
+
+  $('#ovAdd').addEventListener('click', () => {
+    const id = $('#ovName').value;
+    const type = $('#ovType').value;
+    const start = $('#ovStart').value;
+    const end = $('#ovEnd').value || start;
+    if (!start) return showErr('请选择开始日期');
+    if (end < start) return showErr('结束日期不能早于开始日期');
+    showErr('');
+    overrides.push({ id: uid(), name: id, type, start, end });
+    writeJSON(K.ov, overrides);
+    $('#ovStart').value = '';
+    $('#ovEnd').value = '';
+    refresh();
+  });
+
+  $('#logList').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-del]');
+    if (!b) return;
+    overrides = overrides.filter((o) => String(o.id) !== String(b.dataset.del));
+    writeJSON(K.ov, overrides);
+    refresh();
+  });
+
+  $('#rulesBody').addEventListener('click', (e) => {
+    const pat = e.target.closest('[data-pat]');
+    if (pat) {
+      const i = Number(pat.dataset.pat);
+      cprPattern[i] = !cprPattern[i];
+      writeJSON(K.cpr, cprPattern);
+      renderRules();
+      refresh();
+      return;
+    }
+    if (e.target.id === 'resetAll') {
+      if (!window.confirm('确定清空本机保存的排班设置和手动记录？')) return;
+      try { [K.ov, K.qy, K.cpr, K.sel, 'threeFriends_Rests'].forEach((k) => localStorage.removeItem(k)); } catch (_) {}
+      overrides = [];
+      qyWeeks = {};
+      cprPattern = DEFAULT_CPR_PATTERN.slice();
+      selected = MEMBERS.map((m) => m.id);
+      viewDate = new Date(today.getFullYear(), today.getMonth(), 1);
+      writeJSON(K.ov, []); // 阻断旧版数据再次迁移
+      showErr('');
+      renderRules();
+      refresh();
+    }
+  });
+
+  /* ============================================================
+   * 启动
+   * ============================================================ */
+  renderRules();
+  refresh();
+
+  // 跨零点后自动刷新"今天"
+  function checkNewDay() {
+    const now = startOfDay(new Date());
+    if (fmt(now) !== todayStr) { today = now; todayStr = fmt(today); refresh(); }
+  }
+  setInterval(checkNewDay, 60000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) checkNewDay(); });
+})();
+</script>
+</body>
+</html>
